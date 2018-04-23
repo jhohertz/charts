@@ -1,9 +1,9 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: {{ template "fullname" . }}-orca
+  name: {{ template "spinnaker.fullname" . }}-orca
   labels:
-    app: {{ template "fullname" . }}
+    app: {{ template "spinnaker.fullname" . }}
     component: orca
 spec:
   strategy:
@@ -15,13 +15,14 @@ spec:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap/spinnaker-config.yaml") . | sha256sum }}
       labels:
-        app: {{ template "fullname" . }}
+        app: {{ template "spinnaker.fullname" . }}
         component: orca
     spec:
       {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
       {{- end }}
+      serviceAccountName: {{ template "spinnaker.serviceAccountName" . }}
       containers:
         - image: {{ .Values.images.orca }}
           name: orca
@@ -30,7 +31,7 @@ spec:
               name: orca
           volumeMounts:
             - mountPath: /opt/spinnaker/config
-              name: {{ template "fullname" . }}-spinnaker-config
+              name: {{ template "spinnaker.fullname" . }}-spinnaker-config
           readinessProbe:
             httpGet:
               path: /health
@@ -38,6 +39,6 @@ spec:
             initialDelaySeconds: 20
             timeoutSeconds: 1
       volumes:
-        - name: {{ template "fullname" . }}-spinnaker-config
+        - name: {{ template "spinnaker.fullname" . }}-spinnaker-config
           configMap:
-            name: {{ template "fullname" . }}-spinnaker-config
+            name: {{ template "spinnaker.fullname" . }}-spinnaker-config

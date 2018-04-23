@@ -1,9 +1,9 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: {{ template "fullname" . }}-front50
+  name: {{ template "spinnaker.fullname" . }}-front50
   labels:
-    app: {{ template "fullname" . }}
+    app: {{ template "spinnaker.fullname" . }}
     component: front50
 spec:
   strategy:
@@ -15,13 +15,14 @@ spec:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap/spinnaker-config.yaml") . | sha256sum }}
       labels:
-        app: {{ template "fullname" . }}
+        app: {{ template "spinnaker.fullname" . }}
         component: front50
     spec:
       {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
       {{- end }}
+      serviceAccountName: {{ template "spinnaker.serviceAccountName" . }}
       containers:
         - image: {{ .Values.images.front50 }}
           name: front50
@@ -30,12 +31,12 @@ spec:
               name: front50
           volumeMounts:
             - mountPath: /opt/spinnaker/config
-              name: {{ template "fullname" . }}-spinnaker-config
+              name: {{ template "spinnaker.fullname" . }}-spinnaker-config
             - mountPath: /root/.aws
-              name: {{ template "fullname" . }}-s3-config
+              name: {{ template "spinnaker.fullname" . }}-s3-config
             {{ if .Values.gcs.enabled }}
             - mountPath: /root/.kube
-              name: {{ template "fullname" . }}-gcs
+              name: {{ template "spinnaker.fullname" . }}-gcs
             {{ end }}
           readinessProbe:
             httpGet:
@@ -44,14 +45,14 @@ spec:
             initialDelaySeconds: 20
             timeoutSeconds: 1
       volumes:
-        - name: {{ template "fullname" . }}-spinnaker-config
+        - name: {{ template "spinnaker.fullname" . }}-spinnaker-config
           configMap:
-            name: {{ template "fullname" . }}-spinnaker-config
-        - name: {{ template "fullname" . }}-s3-config
+            name: {{ template "spinnaker.fullname" . }}-spinnaker-config
+        - name: {{ template "spinnaker.fullname" . }}-s3-config
           configMap:
-            name: {{ template "fullname" . }}-s3-config
+            name: {{ template "spinnaker.fullname" . }}-s3-config
         {{ if .Values.gcs.enabled }}
-        - name: {{ template "fullname" . }}-gcs
+        - name: {{ template "spinnaker.fullname" . }}-gcs
           secret:
-            secretName: {{ template "fullname" . }}-gcs
+            secretName: {{ template "spinnaker.fullname" . }}-gcs
         {{ end }}

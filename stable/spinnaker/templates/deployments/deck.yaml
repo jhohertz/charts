@@ -1,9 +1,9 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: {{ template "fullname" . }}-deck
+  name: {{ template "spinnaker.fullname" . }}-deck
   labels:
-    app: {{ template "fullname" . }}
+    app: {{ template "spinnaker.fullname" . }}
     component: deck
 spec:
   strategy:
@@ -15,19 +15,20 @@ spec:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap/spinnaker-config.yaml") . | sha256sum }}
       labels:
-        app: {{ template "fullname" . }}
+        app: {{ template "spinnaker.fullname" . }}
         component: deck
     spec:
       {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
       {{- end }}
+      serviceAccountName: {{ template "spinnaker.serviceAccountName" . }}
       containers:
         - image: {{ .Values.images.deck }}
           name: deck
           env:
             - name: API_HOST
-              value: http://{{ template "fullname" . }}-gate:8084/
+              value: http://{{ template "spinnaker.fullname" . }}-gate:8084/
             - name: DECK_HOST
               value: "0.0.0.0"
             - name: DECK_PORT
@@ -37,8 +38,8 @@ spec:
               name: deck
           volumeMounts:
             - mountPath: /opt/spinnaker/config
-              name: {{ template "fullname" . }}-spinnaker-config
+              name: {{ template "spinnaker.fullname" . }}-spinnaker-config
       volumes:
-        - name: {{ template "fullname" . }}-spinnaker-config
+        - name: {{ template "spinnaker.fullname" . }}-spinnaker-config
           configMap:
-            name: {{ template "fullname" . }}-spinnaker-config
+            name: {{ template "spinnaker.fullname" . }}-spinnaker-config

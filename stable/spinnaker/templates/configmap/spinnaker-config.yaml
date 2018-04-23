@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "fullname" . }}-spinnaker-config
+  name: {{ template "spinnaker.fullname" . }}-spinnaker-config
   labels:
-    app: {{ template "fullname" . }}
+    app: {{ template "spinnaker.fullname" . }}
 data:
   clouddriver.yml: |
     server:
@@ -280,7 +280,7 @@ data:
         protocol: http
 
       clouddriver:
-        host: {{ template "fullname" . }}-clouddriver
+        host: {{ template "spinnaker.fullname" . }}-clouddriver
         port: 7002
         baseUrl: ${services.default.protocol}://${services.clouddriver.host}:${services.clouddriver.port}
         # Controls whether UserDataProviders are used to populate user data of new server groups.
@@ -292,7 +292,7 @@ data:
 
       echo:
         enabled: true
-        host: {{ template "fullname" . }}-echo
+        host: {{ template "spinnaker.fullname" . }}-echo
         port: 8089
         baseUrl: ${services.default.protocol}://${services.echo.host}:${services.echo.port}
         cron:
@@ -321,7 +321,7 @@ data:
             token: {{ .Values.slack.token }}
 
       deck:
-        host: {{ template "fullname" . }}-deck
+        host: {{ template "spinnaker.fullname" . }}-deck
         port: 9000
         baseUrl: ${services.default.protocol}://${services.deck.host}:${services.deck.port}
         gateUrl: ${services.gate.baseUrl}
@@ -331,7 +331,7 @@ data:
           enabled: false
 
       front50:
-        host: {{ template "fullname" . }}-front50
+        host: {{ template "spinnaker.fullname" . }}-front50
         port: 8080
         baseUrl: ${services.default.protocol}://${services.front50.host}:${services.front50.port}
 
@@ -355,10 +355,10 @@ data:
           enabled: false
         s3:
           enabled: true
-          endpoint: http://{{ .Release.Name }}-minio-svc:9000
+          endpoint: http://{{ .Release.Name }}-minio:9000
         {{ end }}
       gate:
-        host: {{ template "fullname" . }}-gate
+        host: {{ template "spinnaker.fullname" . }}-gate
         port: 8084
         baseUrl: ${services.default.protocol}://${services.gate.host}:${services.gate.port}/gate
 
@@ -366,7 +366,7 @@ data:
         # If you are integrating Jenkins then you must also enable Spinnaker's
         # "igor" subsystem.
         enabled: true
-        host: {{ template "fullname" . }}-igor
+        host: {{ template "spinnaker.fullname" . }}-igor
         port: 8088
         baseUrl: ${services.default.protocol}://${services.igor.host}:${services.igor.port}
 
@@ -381,7 +381,7 @@ data:
         baseUrl: ${services.clouddriver.baseUrl}
 
       orca:
-        host: {{ template "fullname" . }}-orca
+        host: {{ template "spinnaker.fullname" . }}-orca
         port: 8083
         baseUrl: ${services.default.protocol}://${services.orca.host}:${services.orca.port}
         enabled: true
@@ -392,7 +392,7 @@ data:
         baseUrl: ${services.clouddriver.baseUrl}
 
       rosco:
-        host: {{ template "fullname" . }}-rosco
+        host: {{ template "spinnaker.fullname" . }}-rosco
         port: 8087
         baseUrl: ${services.default.protocol}://${services.rosco.host}:${services.rosco.port}
         # You need to provide the fully-qualified path to the directory containing the packer templates.
@@ -428,9 +428,9 @@ data:
           password: admin
 
       redis:
-        host: {{ .Release.Name }}-redis
+        host: {{ .Release.Name }}-redis-master
         port: 6379
-        connection: redis://:{{ .Values.redis.redisPassword }}@${services.redis.host}:${services.redis.port}
+        connection: redis://:{{ .Values.redis.password }}@${services.redis.host}:${services.redis.port}
 
     providers:
     {{ with $account := first .Values.accounts }}

@@ -4,7 +4,7 @@ kind: Job
 metadata:
   name: "{{.Release.Name}}-upload-run-pipeline"
   labels:
-    app: {{ template "fullname" . }}
+    app: {{ template "spinnaker.fullname" . }}
     component: jenkins
   annotations:
     "helm.sh/hook": post-install
@@ -12,7 +12,7 @@ spec:
   template:
     metadata:
       labels:
-        app: {{ template "fullname" . }}
+        app: {{ template "spinnaker.fullname" . }}
         component: jenkins
     spec:
       {{- if .Values.nodeSelector }}
@@ -24,6 +24,7 @@ spec:
       - name: jenkins-jobs
         configMap:
           name: {{ .Release.Name }}-jenkins-jobs
+      serviceAccountName: {{ template "spinnaker.serviceAccountName" . }}
       containers:
       - name: post-install-job
         image: "viglesiasce/minio-client:v0.4.0"

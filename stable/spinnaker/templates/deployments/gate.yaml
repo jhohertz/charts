@@ -1,9 +1,9 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: {{ template "fullname" . }}-gate
+  name: {{ template "spinnaker.fullname" . }}-gate
   labels:
-    app: {{ template "fullname" . }}
+    app: {{ template "spinnaker.fullname" . }}
     component: gate
 spec:
   strategy:
@@ -15,13 +15,14 @@ spec:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap/spinnaker-config.yaml") . | sha256sum }}
       labels:
-        app: {{ template "fullname" . }}
+        app: {{ template "spinnaker.fullname" . }}
         component: gate
     spec:
       {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
       {{- end }}
+      serviceAccountName: {{ template "spinnaker.serviceAccountName" . }}
       containers:
         - image: {{ .Values.images.gate }}
           name: gate
@@ -30,7 +31,7 @@ spec:
               name: gate
           volumeMounts:
             - mountPath: /opt/spinnaker/config
-              name: {{ template "fullname" . }}-spinnaker-config
+              name: {{ template "spinnaker.fullname" . }}-spinnaker-config
           livenessProbe:
             httpGet:
               path: /health
@@ -38,6 +39,6 @@ spec:
             initialDelaySeconds: 30
             timeoutSeconds: 1
       volumes:
-        - name: {{ template "fullname" . }}-spinnaker-config
+        - name: {{ template "spinnaker.fullname" . }}-spinnaker-config
           configMap:
-            name: {{ template "fullname" . }}-spinnaker-config
+            name: {{ template "spinnaker.fullname" . }}-spinnaker-config

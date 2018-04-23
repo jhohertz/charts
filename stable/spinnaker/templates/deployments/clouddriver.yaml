@@ -1,9 +1,9 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: {{ template "fullname" . }}-clouddriver
+  name: {{ template "spinnaker.fullname" . }}-clouddriver
   labels:
-    app: {{ template "fullname" . }}
+    app: {{ template "spinnaker.fullname" . }}
     component: clouddriver
 spec:
   strategy:
@@ -15,13 +15,14 @@ spec:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap/spinnaker-config.yaml") . | sha256sum }}
       labels:
-        app: {{ template "fullname" . }}
+        app: {{ template "spinnaker.fullname" . }}
         component: clouddriver
     spec:
       {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
       {{- end }}
+      serviceAccountName: {{ template "spinnaker.serviceAccountName" . }}
       containers:
         - image: {{ .Values.images.clouddriver }}
           name: clouddriver
@@ -30,9 +31,9 @@ spec:
               name: clouddriver
           volumeMounts:
             - mountPath: /opt/spinnaker/config
-              name: {{ template "fullname" . }}-spinnaker-config
+              name: {{ template "spinnaker.fullname" . }}-spinnaker-config
             - mountPath: /tmp/registry
-              name: {{ template "fullname" . }}-registry
+              name: {{ template "spinnaker.fullname" . }}-registry
           readinessProbe:
             httpGet:
               path: /health
@@ -40,9 +41,9 @@ spec:
             initialDelaySeconds: 20
             timeoutSeconds: 1
       volumes:
-        - name: {{ template "fullname" . }}-spinnaker-config
+        - name: {{ template "spinnaker.fullname" . }}-spinnaker-config
           configMap:
-            name: {{ template "fullname" . }}-spinnaker-config
-        - name: {{ template "fullname" . }}-registry
+            name: {{ template "spinnaker.fullname" . }}-spinnaker-config
+        - name: {{ template "spinnaker.fullname" . }}-registry
           secret:
-            secretName: {{ template "fullname" . }}-registry
+            secretName: {{ template "spinnaker.fullname" . }}-registry

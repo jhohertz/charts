@@ -1,0 +1,28 @@
+{{- if .Values.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  labels:
+    app: {{ template "spinnaker.name" . }}
+    chart: {{ template "spinnaker.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+  name: {{ template "spinnaker.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+rules:
+- apiGroups: [""]
+  resources: ["namespaces", "configmaps", "events", "replicationcontrollers", "serviceaccounts", "pods/logs"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["pods", "pods/portforward", "services", "secrets"]
+  verbs: ["*"]
+- apiGroups: ["autoscaling"]
+  resources: ["horizontalpodautoscalers"]
+  verbs: ["list", "get"]
+- apiGroups: ["apps"]
+  resources: ["controllerrevisions", "statefulsets"]
+  verbs: ["list"]
+- apiGroups: ["extensions", "app"]
+  resources: ["deployments", "replicasets", "ingresses", "daemonsets"]
+  verbs: ["*"]
+{{- end }}

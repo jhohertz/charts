@@ -3,6 +3,16 @@
 # For more info visit:
 #   https://www.spinnaker.io/setup/providers/docker-registry/
 
+rbac:
+  create: true
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
 # Configure your Docker registries here
 accounts:
 - name: dockerhub
@@ -36,11 +46,11 @@ slack:
 
 # Images for each component
 images:
-  clouddriver: gcr.io/spinnaker-marketplace/clouddriver:2.0.0-20180221152902
+  clouddriver: gcr.io/spinnaker-marketplace/clouddriver:2.1.0-20180319132609
   echo: gcr.io/spinnaker-marketplace/echo:0.8.0-20180221133510
-  deck: gcr.io/spinnaker-marketplace/deck:2.1.0-20180221143146
+  deck: gcr.io/spinnaker-marketplace/deck:2.1.1-20180302170105
   igor: gcr.io/spinnaker-marketplace/igor:0.9.0-20180221133510
-  orca: gcr.io/spinnaker-marketplace/orca:0.10.0-20180221133510
+  orca: gcr.io/spinnaker-marketplace/orca:0.10.1-20180326113234
   gate: gcr.io/spinnaker-marketplace/gate:0.10.0-20180221133510
   front50: gcr.io/spinnaker-marketplace/front50:0.9.0-20180221133510
   rosco: gcr.io/spinnaker-marketplace/rosco:0.5.0-20180221133510
@@ -88,18 +98,14 @@ nodeSelector: {}
 # Redis password to use for the in-cluster redis service
 # Redis is not exposed publically
 redis:
-  redisPassword: password
-  nodeSelector: {}
+  password: password
 
 # Minio access/secret keys for the in-cluster S3 usage
 # Minio is not exposed publically
 minio:
   enabled: true
-  imageTag: RELEASE.2016-11-26T02-23-47Z
-  serviceType: ClusterIP
   accessKey: spinnakeradmin
   secretKey: spinnakeradmin
-  nodeSelector: {}
 
 gcs:
   enabled: false

@@ -1,9 +1,9 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: {{ template "fullname" . }}-rosco
+  name: {{ template "spinnaker.fullname" . }}-rosco
   labels:
-    app: {{ template "fullname" . }}
+    app: {{ template "spinnaker.fullname" . }}
     component: rosco
 spec:
   strategy:
@@ -15,13 +15,14 @@ spec:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap/spinnaker-config.yaml") . | sha256sum }}
       labels:
-        app: {{ template "fullname" . }}
+        app: {{ template "spinnaker.fullname" . }}
         component: rosco
     spec:
       {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
       {{- end }}
+      serviceAccountName: {{ template "spinnaker.serviceAccountName" . }}
       containers:
         - image: {{ .Values.images.rosco }}
           name: rosco
@@ -30,7 +31,7 @@ spec:
               name: rosco
           volumeMounts:
             - mountPath: /opt/spinnaker/config
-              name: {{ template "fullname" . }}-spinnaker-config
+              name: {{ template "spinnaker.fullname" . }}-spinnaker-config
             - mountPath: /usr/bin/docker
               name: docker-bin
             - mountPath: /var/run/docker.sock
@@ -42,9 +43,9 @@ spec:
             initialDelaySeconds: 20
             timeoutSeconds: 1
       volumes:
-        - name: {{ template "fullname" . }}-spinnaker-config
+        - name: {{ template "spinnaker.fullname" . }}-spinnaker-config
           configMap:
-            name: {{ template "fullname" . }}-spinnaker-config
+            name: {{ template "spinnaker.fullname" . }}-spinnaker-config
         - name: docker-bin
           hostPath:
             path: /usr/bin/docker

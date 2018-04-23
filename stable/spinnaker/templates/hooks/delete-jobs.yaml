@@ -3,7 +3,7 @@ kind: Job
 metadata:
   name: "{{ .Release.Name }}-delete-jobs"
   labels:
-    app: {{ template "fullname" . }}
+    app: {{ template "spinnaker.fullname" . }}
     component: spinnaker
   annotations:
     "helm.sh/hook": post-delete
@@ -11,7 +11,7 @@ spec:
   template:
     metadata:
       labels:
-        app: {{ template "fullname" . }}
+        app: {{ template "spinnaker.fullname" . }}
         component: spinnaker
     spec:
       {{- if .Values.nodeSelector }}
@@ -24,6 +24,7 @@ spec:
         hostPath:
           path: /usr/bin/kubectl
 
+      serviceAccountName: {{ template "spinnaker.serviceAccountName" . }}
       containers:
       - name: post-install-job
         image: "lachlanevenson/k8s-kubectl:v1.6.0"
@@ -33,4 +34,4 @@ spec:
         command:
         - sh
         - -c
-        - "kubectl delete job --namespace {{ .Release.Namespace }} -l app={{ template "fullname" . }}"
+        - "kubectl delete job --namespace {{ .Release.Namespace }} -l app={{ template "spinnaker.fullname" . }}"

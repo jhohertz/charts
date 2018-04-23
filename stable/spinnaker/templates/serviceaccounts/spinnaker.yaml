@@ -1,0 +1,13 @@
+{{- if .Values.serviceAccount.create -}}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: {{ template "spinnaker.name" . }}
+    chart: {{ template "spinnaker.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+  name: {{ template "spinnaker.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+{{- end -}}
+

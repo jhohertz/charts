@@ -4,7 +4,7 @@ kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}-jenkins-jobs
   labels:
-    app: {{ template "fullname" . }}
+    app: {{ template "spinnaker.fullname" . }}
 data:
   run-script.xml: |-
     <?xml version='1.0' encoding='UTF-8'?>
