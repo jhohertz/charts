@@ -32,4 +32,14 @@ rules:
       - get
       - list
       - watch
+  {{- if .Values.crd.enabled }}
+  - apiGroups:
+      - externaldns.k8s.io
+    resources:
+      - dnsendpoints
+    verbs:
+      - get
+      - list
+      - watch
+  {{- end }}
 {{- end -}}
